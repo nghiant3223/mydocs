@@ -1,5 +1,11 @@
 package item
 
+import "errors"
+
+var (
+	InvalidItemData = errors.New("invalid item data")
+)
+
 type Service interface {
 	GetOneItem(id uint) (Item, error)
 	GetItemTree() ([]Item, error)
@@ -46,6 +52,10 @@ func (s *service) GetItemTree() ([]Item, error) {
 }
 
 func (s *service) CreateItem(body CreateItemRequestBody) (Item, error) {
+	err := validateCreateItemRequestBody(body)
+	if err != nil {
+		return Item{}, err
+	}
 	return s.repo.Create(body)
 }
 
@@ -55,4 +65,14 @@ func (s *service) UpdateItem(id uint, body UpdateItemRequestBody) (Item, error) 
 
 func (s *service) DeleteItem(id uint) error {
 	return s.repo.DeleteByID(id)
+}
+
+func validateCreateItemRequestBody(body CreateItemRequestBody) error {
+	if body.Type == Subject && body.Content != nil {
+		return InvalidItemData
+	}
+	if body.Type == Article && (body.Content == nil || *(body.Content) == "") {
+		return InvalidItemData
+	}
+	return nil
 }

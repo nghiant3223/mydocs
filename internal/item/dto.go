@@ -7,6 +7,7 @@ type UpdateItemRequestBody struct {
 }
 
 type CreateItemRequestBody struct {
+	Type    Type    `json:"type"`
 	Title   string  `json:"title"`
 	Content *string `json:"content"`
 	Order   int     `json:"order"`

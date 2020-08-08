@@ -49,7 +49,7 @@ func (r *repository) Create(body CreateItemRequestBody) (Item, error) {
 func (r *repository) UpdateByID(id uint, body UpdateItemRequestBody) (Item, error) {
 	item, err := r.FindByID(id)
 	if err != nil {
-		return item, err
+		return Item{}, err
 	}
 	err = r.db.Model(&item).Update(body).Error
 	return item, err
