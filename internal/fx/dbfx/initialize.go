@@ -14,13 +14,14 @@ import (
 func provideDB(lc fx.Lifecycle) (*gorm.DB, error) {
 	dialect := viper.GetString("db.dialect")
 	url := viper.GetString("db.url")
+	log := viper.GetBool("db.log")
 
 	db, err := gorm.Open(dialect, url)
 	if err != nil {
 		return nil, err
 	}
 
-	db.LogMode(true)
+	db.LogMode(log)
 	lc.Append(
 		fx.Hook{
 			OnStop: func(ctx context.Context) error {
