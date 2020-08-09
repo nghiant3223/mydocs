@@ -7,8 +7,8 @@ import (
 type Repository interface {
 	FindByID(id uint) (Item, error)
 	FindByParentID(parentID *uint) ([]Item, error)
-	Create(body CreateItemRequestBody) (Item, error)
-	UpdateByID(id uint, body UpdateItemRequestBody) (Item, error)
+	Create(item Item) (Item, error)
+	UpdateByID(id uint, item Item) (Item, error)
 	DeleteByID(id uint) error
 }
 
@@ -30,7 +30,7 @@ func (r *repository) FindByParentID(parentID *uint) ([]Item, error) {
 	} else {
 		query = r.db.Where("parent_id = ?", parentID)
 	}
-	err := query.Order("'order' ASC").Find(&items).Error
+	err := query.Order("priority ASC").Find(&items).Error
 	return items, err
 }
 
@@ -40,18 +40,17 @@ func (r *repository) FindByID(id uint) (Item, error) {
 	return item, err
 }
 
-func (r *repository) Create(body CreateItemRequestBody) (Item, error) {
-	item := body.toItem()
+func (r *repository) Create(item Item) (Item, error) {
 	err := r.db.Create(&item).Error
 	return item, err
 }
 
-func (r *repository) UpdateByID(id uint, body UpdateItemRequestBody) (Item, error) {
+func (r *repository) UpdateByID(id uint, item Item) (Item, error) {
 	item, err := r.FindByID(id)
 	if err != nil {
 		return Item{}, err
 	}
-	err = r.db.Model(&item).Update(body).Error
+	err = r.db.Model(&item).Update(item).Error
 	return item, err
 }
 

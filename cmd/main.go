@@ -8,7 +8,7 @@ import (
 	"github.com/google/martian/log"
 	"github.com/nghiant3223/mydocs/internal/fx/dbfx"
 	"github.com/nghiant3223/mydocs/internal/fx/itemfx"
-	"github.com/nghiant3223/mydocs/internal/item"
+	"github.com/nghiant3223/mydocs/pkg/controller"
 	"github.com/spf13/viper"
 	"go.uber.org/fx"
 )
@@ -34,16 +34,19 @@ func readConfig() {
 	}
 }
 
-func initialize(lc fx.Lifecycle, itemController item.Controller) {
+func initialize(lc fx.Lifecycle, itemController controller.Controller) {
 	port := viper.GetString("port")
 
 	router := gin.New()
 	apiRouter := router.Group("/api")
-	itemController.Register(apiRouter)
+
+	itemRouter := apiRouter.Group("/items")
+	itemController.Register(itemRouter)
 
 	err := router.Run(":" + port)
 	if err != nil {
 		log.Infof("Fail to start server on port " + port)
+		return
 	}
 
 	lc.Append(fx.Hook{

@@ -1,10 +1,6 @@
 package item
 
-import "errors"
-
-var (
-	InvalidItemData = errors.New("invalid item data")
-)
+import "github.com/nghiant3223/mydocs/pkg/apperrors"
 
 type Service interface {
 	GetOneItem(id uint) (Item, error)
@@ -56,11 +52,17 @@ func (s *service) CreateItem(body CreateItemRequestBody) (Item, error) {
 	if err != nil {
 		return Item{}, err
 	}
-	return s.repo.Create(body)
+	item := body.toItem()
+	return s.repo.Create(item)
 }
 
 func (s *service) UpdateItem(id uint, body UpdateItemRequestBody) (Item, error) {
-	return s.repo.UpdateByID(id, body)
+	err := validateUpdateItemRequestBody(body)
+	if err != nil {
+		return Item{}, err
+	}
+	item := body.toItem()
+	return s.repo.UpdateByID(id, item)
 }
 
 func (s *service) DeleteItem(id uint) error {
@@ -69,10 +71,20 @@ func (s *service) DeleteItem(id uint) error {
 
 func validateCreateItemRequestBody(body CreateItemRequestBody) error {
 	if body.Type == Subject && body.Content != nil {
-		return InvalidItemData
+		return apperrors.InvalidItemData
 	}
 	if body.Type == Article && (body.Content == nil || *(body.Content) == "") {
-		return InvalidItemData
+		return apperrors.InvalidItemData
+	}
+	return nil
+}
+
+func validateUpdateItemRequestBody(body UpdateItemRequestBody) error {
+	if body.Type == Subject && body.Content != nil {
+		return apperrors.InvalidItemData
+	}
+	if body.Type == Article && (body.Content == nil || *(body.Content) == "") {
+		return apperrors.InvalidItemData
 	}
 	return nil
 }
