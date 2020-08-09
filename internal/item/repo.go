@@ -2,6 +2,7 @@ package item
 
 import (
 	"github.com/jinzhu/gorm"
+	"github.com/nghiant3223/mydocs/pkg/apperrors"
 )
 
 type Repository interface {
@@ -37,6 +38,9 @@ func (r *repository) FindByParentID(parentID *uint) ([]Item, error) {
 func (r *repository) FindByID(id uint) (Item, error) {
 	var item Item
 	err := r.db.First(&item, id).Error
+	if gorm.IsRecordNotFoundError(err) {
+		err = apperrors.RecordNotFound
+	}
 	return item, err
 }
 
@@ -45,15 +49,15 @@ func (r *repository) Create(item Item) (Item, error) {
 	return item, err
 }
 
-func (r *repository) UpdateByID(id uint, item Item) (Item, error) {
+func (r *repository) UpdateByID(id uint, updates Item) (Item, error) {
 	item, err := r.FindByID(id)
 	if err != nil {
 		return Item{}, err
 	}
-	err = r.db.Model(&item).Update(item).Error
+	err = r.db.Model(&item).Update(updates).Error
 	return item, err
 }
 
 func (r *repository) DeleteByID(id uint) error {
-	return r.db.Where("id = ?", id).Delete(&Item{}).Error
+	return r.db.Where("id = ?", id).Unscoped().Delete(&Item{}).Error
 }

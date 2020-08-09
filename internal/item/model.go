@@ -1,6 +1,6 @@
 package item
 
-import "github.com/nghiant3223/mydocs/internal/basemodel"
+import "github.com/nghiant3223/mydocs/pkg/basemodel"
 
 type Item struct {
 	basemodel.Model

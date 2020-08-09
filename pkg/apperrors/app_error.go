@@ -1,12 +1,12 @@
 package apperrors
 
 type AppError struct {
-	Status  int
+	Code    int
 	Message string
 }
 
-func NewAppError(httpCode int, message string) error {
-	return &AppError{Status: httpCode, Message: message}
+func NewAppError(code int, message string) error {
+	return &AppError{Code: code, Message: message}
 }
 
 func (a *AppError) Error() string {

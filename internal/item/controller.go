@@ -1,8 +1,6 @@
 package item
 
 import (
-	"net/http"
-
 	"github.com/gin-gonic/gin"
 	"github.com/nghiant3223/mydocs/pkg/apperrors"
 	"github.com/nghiant3223/mydocs/pkg/controller"
@@ -29,10 +27,10 @@ func (c *itemController) Register(g gin.IRouter) {
 func (c *itemController) getItemTree(ctx *gin.Context) {
 	tree, err := c.service.GetItemTree()
 	if err != nil {
-		c.HandleError(ctx, err)
+		c.ReportError(ctx, err)
 		return
 	}
-	ctx.JSON(http.StatusOK, tree)
+	c.ReportSuccess(ctx, tree)
 }
 
 func (c *itemController) createItem(ctx *gin.Context) {
@@ -40,26 +38,26 @@ func (c *itemController) createItem(ctx *gin.Context) {
 	err := ctx.ShouldBindJSON(&body)
 	if err != nil {
 		err = apperrors.InvalidItemData
-		c.HandleError(ctx, err)
+		c.ReportError(ctx, err)
 		return
 	}
 	item, err := c.service.CreateItem(body)
 	if err != nil {
-		c.HandleError(ctx, err)
+		c.ReportError(ctx, err)
 		return
 	}
-	ctx.JSON(http.StatusOK, item)
+	c.ReportSuccess(ctx, item)
 }
 
 func (c *itemController) getOneItem(ctx *gin.Context) {
 	paramID := ctx.Param("id")
 	itemID := cast.ToUint(paramID)
-	item, err := c.service.GetOneItem(itemIgD)
+	item, err := c.service.GetOneItem(itemID)
 	if err != nil {
-		c.HandleError(ctx, err)
+		c.ReportError(ctx, err)
 		return
 	}
-	ctx.JSON(http.StatusOK, item)
+	c.ReportSuccess(ctx, item)
 }
 
 func (c *itemController) deleteItem(ctx *gin.Context) {
@@ -67,10 +65,10 @@ func (c *itemController) deleteItem(ctx *gin.Context) {
 	itemID := cast.ToUint(paramID)
 	err := c.service.DeleteItem(itemID)
 	if err != nil {
-		c.HandleError(ctx, err)
+		c.ReportError(ctx, err)
 		return
 	}
-	ctx.Status(http.StatusNoContent)
+	c.ReportSuccess(ctx, nil)
 }
 
 func (c *itemController) updateItem(ctx *gin.Context) {
@@ -80,13 +78,13 @@ func (c *itemController) updateItem(ctx *gin.Context) {
 	err := ctx.ShouldBindJSON(&body)
 	if err != nil {
 		err = apperrors.InvalidItemData
-		c.HandleError(ctx, err)
+		c.ReportError(ctx, err)
 		return
 	}
 	item, err := c.service.UpdateItem(itemID, body)
 	if err != nil {
-		c.HandleError(ctx, err)
+		c.ReportError(ctx, err)
 		return
 	}
-	ctx.JSON(http.StatusOK, item)
+	c.ReportSuccess(ctx, item)
 }

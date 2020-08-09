@@ -1,7 +1,11 @@
 package apperrors
 
-import "net/http"
+const (
+	invalidItemData = -1
+	recordNotFound  = -2
+)
 
 var (
-	InvalidItemData = NewAppError(http.StatusBadRequest, "invalid item data")
+	InvalidItemData = NewAppError(invalidItemData, "invalid item data")
+	RecordNotFound  = NewAppError(recordNotFound, "record not found")
 )
