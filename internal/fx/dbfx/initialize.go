@@ -3,10 +3,10 @@ package dbfx
 import (
 	"context"
 
-	_ "github.com/go-sql-driver/mysql"
 	"github.com/jinzhu/gorm"
-
+	_ "github.com/jinzhu/gorm/dialects/postgres"
 	"github.com/nghiant3223/mydocs/internal/item"
+
 	"github.com/spf13/viper"
 	"go.uber.org/fx"
 )
@@ -24,11 +24,11 @@ func provideDB(lc fx.Lifecycle) (*gorm.DB, error) {
 	db.LogMode(log)
 	lc.Append(
 		fx.Hook{
-			OnStop: func(ctx context.Context) error {
-				return db.Close()
-			},
 			OnStart: func(ctx context.Context) error {
 				return db.AutoMigrate(&item.Item{}).Error
+			},
+			OnStop: func(ctx context.Context) error {
+				return db.Close()
 			},
 		},
 	)

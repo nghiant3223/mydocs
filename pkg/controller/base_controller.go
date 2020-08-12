@@ -35,6 +35,7 @@ func (c *BaseController) ReportError(ctx *gin.Context, err error, message ...str
 		Data:       nil,
 	}
 	ctx.JSON(defaultStatus, res)
+	ctx.Abort()
 }
 
 func (c *BaseController) ReportSuccess(ctx *gin.Context, data interface{}, message ...string) {

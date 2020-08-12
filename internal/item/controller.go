@@ -4,24 +4,26 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/nghiant3223/mydocs/pkg/apperrors"
 	"github.com/nghiant3223/mydocs/pkg/controller"
+	"github.com/nghiant3223/mydocs/pkg/middleware"
 	"github.com/spf13/cast"
 )
 
 type itemController struct {
 	controller.BaseController
-	service Service
+	service    Service
+	middleware middleware.Middleware
 }
 
-func NewController(service Service) controller.Controller {
-	return &itemController{service: service}
+func NewController(service Service, middleware middleware.Middleware) controller.Controller {
+	return &itemController{service: service, middleware: middleware}
 }
 
 func (c *itemController) Register(g gin.IRouter) {
 	g.GET("/", c.getItemTree)
 	g.GET("/:id", c.getOneItem)
-	g.POST("/", c.createItem)
-	g.PATCH("/:id", c.updateItem)
-	g.DELETE("/:id", c.deleteItem)
+	g.POST("/", c.middleware.VerifyToken, c.createItem)
+	g.PATCH("/:id", c.middleware.VerifyToken, c.updateItem)
+	g.DELETE("/:id", c.middleware.VerifyToken, c.deleteItem)
 }
 
 func (c *itemController) getItemTree(ctx *gin.Context) {

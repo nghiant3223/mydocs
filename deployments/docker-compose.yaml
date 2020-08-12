@@ -1,16 +1,15 @@
 version: '3'
 services:
   db:
-    image: mysql
+    image: postgres
     volumes:
-      - mydocs_data:/var/lib/mysql
+      - mydocs_data:/var/lib/postgresql/data/
     restart: always
     ports:
-      - "3306:3306"
+      - "5432:5432"
     environment:
-      MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: mydocs
-      MYSQL_USER: admin
-      MYSQL_PASSWORD: admin
+      POSTGRES_USER: nghiant11
+      POSTGRES_PASSWORD: magical_password
+      POSTGRES_DB: mydocs
 volumes:
   mydocs_data: {}

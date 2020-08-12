@@ -8,6 +8,8 @@ import (
 	"github.com/google/martian/log"
 	"github.com/nghiant3223/mydocs/internal/fx/dbfx"
 	"github.com/nghiant3223/mydocs/internal/fx/itemfx"
+	"github.com/nghiant3223/mydocs/internal/fx/middlewarefx"
+	"github.com/nghiant3223/mydocs/internal/fx/tokenmngfx"
 	"github.com/nghiant3223/mydocs/pkg/controller"
 	"github.com/spf13/viper"
 	"go.uber.org/fx"
@@ -18,6 +20,8 @@ func main() {
 	app := fx.New(
 		dbfx.Module,
 		itemfx.Module,
+		tokenmngfx.Module,
+		middlewarefx.Module,
 		fx.Invoke(initialize),
 	)
 	app.Run()
@@ -43,15 +47,9 @@ func initialize(lc fx.Lifecycle, itemController controller.Controller) {
 	itemRouter := apiRouter.Group("/items")
 	itemController.Register(itemRouter)
 
-	err := router.Run(":" + port)
-	if err != nil {
-		log.Infof("Fail to start server on port " + port)
-		return
-	}
-
 	lc.Append(fx.Hook{
 		OnStart: func(ctx context.Context) error {
-			log.Infof("Server listening on port " + port)
+			go startServer(router, port)
 			return nil
 		},
 		OnStop: func(ctx context.Context) error {
@@ -59,4 +57,11 @@ func initialize(lc fx.Lifecycle, itemController controller.Controller) {
 			return nil
 		},
 	})
+}
+
+func startServer(s *gin.Engine, port string) {
+	err := s.Run(":" + port)
+	if err != nil {
+		log.Infof("Fail to start server on port " + port)
+	}
 }
