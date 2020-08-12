@@ -8,17 +8,17 @@ import (
 	"github.com/spf13/cast"
 )
 
-type itemController struct {
+type ctrl struct {
 	controller.BaseController
 	service    Service
 	middleware middleware.Middleware
 }
 
 func NewController(service Service, middleware middleware.Middleware) controller.Controller {
-	return &itemController{service: service, middleware: middleware}
+	return &ctrl{service: service, middleware: middleware}
 }
 
-func (c *itemController) Register(g gin.IRouter) {
+func (c *ctrl) Register(g gin.IRouter) {
 	g.GET("/", c.getItemTree)
 	g.GET("/:id", c.getOneItem)
 	g.POST("/", c.middleware.VerifyToken, c.createItem)
@@ -26,7 +26,7 @@ func (c *itemController) Register(g gin.IRouter) {
 	g.DELETE("/:id", c.middleware.VerifyToken, c.deleteItem)
 }
 
-func (c *itemController) getItemTree(ctx *gin.Context) {
+func (c *ctrl) getItemTree(ctx *gin.Context) {
 	tree, err := c.service.GetItemTree()
 	if err != nil {
 		c.ReportError(ctx, err)
@@ -35,7 +35,7 @@ func (c *itemController) getItemTree(ctx *gin.Context) {
 	c.ReportSuccess(ctx, tree)
 }
 
-func (c *itemController) createItem(ctx *gin.Context) {
+func (c *ctrl) createItem(ctx *gin.Context) {
 	var body CreateItemRequestBody
 	err := ctx.ShouldBindJSON(&body)
 	if err != nil {
@@ -51,7 +51,7 @@ func (c *itemController) createItem(ctx *gin.Context) {
 	c.ReportSuccess(ctx, item)
 }
 
-func (c *itemController) getOneItem(ctx *gin.Context) {
+func (c *ctrl) getOneItem(ctx *gin.Context) {
 	paramID := ctx.Param("id")
 	itemID := cast.ToUint(paramID)
 	item, err := c.service.GetOneItem(itemID)
@@ -62,7 +62,7 @@ func (c *itemController) getOneItem(ctx *gin.Context) {
 	c.ReportSuccess(ctx, item)
 }
 
-func (c *itemController) deleteItem(ctx *gin.Context) {
+func (c *ctrl) deleteItem(ctx *gin.Context) {
 	paramID := ctx.Param("id")
 	itemID := cast.ToUint(paramID)
 	err := c.service.DeleteItem(itemID)
@@ -73,7 +73,7 @@ func (c *itemController) deleteItem(ctx *gin.Context) {
 	c.ReportSuccess(ctx, nil)
 }
 
-func (c *itemController) updateItem(ctx *gin.Context) {
+func (c *ctrl) updateItem(ctx *gin.Context) {
 	paramID := ctx.Param("id")
 	itemID := cast.ToUint(paramID)
 	var body UpdateItemRequestBody

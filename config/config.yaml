@@ -4,3 +4,10 @@ db:
   log: true
   dialect: postgres
   url: host=localhost port=5432 user=nghiant11 dbname=mydocs password=magical_password sslmode=disable
+
+admin:
+  password: a871b25888c7373a7ba071b285f72931
+
+jwt:
+  secret: a871b25888c7373a7ba071b285f72931
+  lifetime: 1h

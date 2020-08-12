@@ -1,10 +1,10 @@
-package itemfx
+package authfx
 
 import "go.uber.org/fx"
 
 var Module = fx.Provide(
 	fx.Annotated{
-		Name:   "item_controller",
+		Name:   "auth_controller",
 		Target: provideController,
 	},
 )

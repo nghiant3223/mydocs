@@ -39,7 +39,7 @@ func (m *manager) Generate(args map[string]interface{}) (string, error) {
 	claims[claimIat] = now
 	claims[claimExp] = now.Add(m.lifetime).Unix()
 	token := jwt.NewWithClaims(alg, claims)
-	return token.SignedString(m.secret)
+	return token.SignedString([]byte(m.secret))
 }
 
 func (m *manager) Validate(tokenStr string) (map[string]interface{}, error) {
@@ -55,5 +55,5 @@ func (m *manager) Validate(tokenStr string) (map[string]interface{}, error) {
 }
 
 func (m *manager) keyFunc(*jwt.Token) (interface{}, error) {
-	return m.secret, nil
+	return []byte(m.secret), nil
 }

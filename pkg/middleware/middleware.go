@@ -1,8 +1,6 @@
 package middleware
 
 import (
-	"strings"
-
 	"github.com/gin-gonic/gin"
 	"github.com/nghiant3223/mydocs/pkg/apperrors"
 	"github.com/nghiant3223/mydocs/pkg/controller"
@@ -24,11 +22,20 @@ func NewMiddleware(manager tokenmanager.Manager) Middleware {
 
 func (m *middleware) VerifyToken(ctx *gin.Context) {
 	tokens := ctx.Request.Header[authorization]
-	if len(tokens) == 0 || !strings.HasPrefix(tokens[0], bearerPrefix) {
+	if len(tokens) == 0 {
 		m.ReportError(ctx, apperrors.Unauthorized)
 		return
 	}
-	_, err := m.tokenManager.Validate(tokens[0])
+
+	token := tokens[0]
+	prefix := token[:len(bearerPrefix)]
+	content := token[len(bearerPrefix):]
+	if prefix != bearerPrefix {
+		m.ReportError(ctx, apperrors.InvalidToken)
+		return
+	}
+
+	_, err := m.tokenManager.Validate(content)
 	if err != nil {
 		m.ReportError(ctx, apperrors.Unauthorized)
 		return
